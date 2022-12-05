@@ -7,12 +7,8 @@ const PORT = 1200
 
 let users = [];
 
-app.use(express.urlencoded({
-    extended: false
-}));
 app.use(cors())
 app.use(express.json())
-
 
 
 
@@ -25,14 +21,20 @@ app.post("/register", (req, res) => {
     try {
 
         if (!req.body.username || !req.body.email || !req.body.password) {
-            res.status(400).send('Bad request: missing username, mail, password')
+            res.status(400).send({
+                status: "bad request",
+                message: "Missing username, mail, password"
+            })
             return;
         }
 
         //looking for doubles 
-        let user = users.find(el => el.email = req.body.email)
+        let user = users.find(el => el.email == req.body.email)
         if (user) {
-            res.status(400).send('Bad request: email edress already used !')
+            res.status(400).send({
+                status: "bad request",
+                message: "This email is already used"
+            })
             return;
         }
 
@@ -48,7 +50,7 @@ app.post("/register", (req, res) => {
         //success message
         res.status(201).send({
             status: "Authentification successfull",
-            message: "saved !"
+            message: "Your account has been successfully created"
         })
         console.log(users)
         return;
@@ -69,7 +71,10 @@ app.post("/login", (req, res) => {
     try {
 
         if (!req.body.email || !req.body.password) {
-            res.status(400).send('Bad request: missing email, password')
+            res.status(400).send({
+                status: "bad request",
+                message: " Missing mail, password"
+            })
             return;
         }
 
@@ -77,12 +82,18 @@ app.post("/login", (req, res) => {
         let password = users.find(element => element.password == req.body.password)
         //If not user is found, send back an appropiate error
         if (!email) {
-            res.status(400).send(`No account with email: ${req.body.email}! Make sure you register first.`)
+            res.status(400).send({
+                status: "bad request",
+                message: "No account with this email! Make sure you register first."
+            })
             return;
         }
         //If a user is found but the password is wrong, send back an appropiate error
         if (email && !password) {
-            res.status(400).send(`Enter a valid password for ${req.body.email}`)
+            res.status(400).send({
+                status: "bad request",
+                message: "Enter the correct password for this email"
+            })
             return;
         }
         //success message
