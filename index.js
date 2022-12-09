@@ -8,7 +8,14 @@ const {
 const {
     ppid
 } = require('process')
+
+const {
+    v4: uuidv4,
+    validate: uuidValidate
+} = require('uuid');
 require('dotenv').config()
+
+
 
 const client = new MongoClient(process.env.FINAL_URL)
 
@@ -23,7 +30,7 @@ app.get("/testMongo", async (req, res) => {
         await client.connect()
 
         //retrieve the usres collection data
-        const colli = client.db('loginsystem').collection('users')
+        const colli = client.db('Nft_Universe').collection('users')
         const users = await colli.find({}).toArray()
 
 
@@ -40,8 +47,6 @@ app.get("/testMongo", async (req, res) => {
         await client.close()
     }
 })
-
-
 
 app.post("/register", async (req, res) => {
 
@@ -63,11 +68,12 @@ app.post("/register", async (req, res) => {
             username: req.body.username,
             email: req.body.email,
             password: req.body.password,
+            uuid: uuidv4()
         }
 
 
         //retrieve the usres collection data
-        const colli = client.db('loginsystem').collection('users')
+        const colli = client.db('Nft_Universe').collection('users')
         const insertedUser = await colli.insertOne(user)
 
 
@@ -98,6 +104,7 @@ app.post("/login", async (req, res) => {
             status: "bad request",
             message: " Missing mail, password"
         })
+        return;
     }
 
 
@@ -112,7 +119,7 @@ app.post("/login", async (req, res) => {
         }
 
         //retrieve the users collection data
-        const colli = client.db('loginsystem').collection('users')
+        const colli = client.db('Nft_Universe').collection('users')
         const query = {
             email: loginuser.email
         }
@@ -131,13 +138,18 @@ app.post("/login", async (req, res) => {
         if (user.password !== loginuser.password) {
             res.status(400).send({
                 status: "bad request",
-                message: "Enter the correct password for this email"
+                message: "Incorrect password for this email"
             })
             return;
         }
         res.status(200).send({
-            data: user,
-            message: "sucessfully logged in !"
+            status: "Verifed",
+            message: "You are successfully logged in!",
+            data: {
+                username: user.username,
+                email: user.email,
+                uuid: user.uuid,
+            }
 
         })
 
@@ -154,6 +166,76 @@ app.post("/login", async (req, res) => {
     }
 
 })
+
+app.post("/verifyID", async (req, res) => {
+
+    //check for empty and faulty ID fields
+    if (!req.body.uuid) {
+        res.status(400).send({
+            status: "bad request",
+            message: "ID is missing"
+        })
+        return;
+    } else {
+        if (!uuidValidate(req.body.uuid)) {
+            res.status(400).send({
+                status: "bad request",
+                message: "ID is not a valid UUID"
+            })
+            return;
+        }
+
+    }
+
+
+
+    try {
+        //connect to the db
+        await client.connect()
+
+        //retrieve the users collection data
+        const colli = client.db('Nft_Universe').collection('users')
+        const query = {
+            uuid: req.body.uuid
+        }
+        const user = await colli.findOne(query)
+
+
+
+        if (user) {
+            res.status(200).send({
+                status: "Verifed",
+                message: "Your UUID is valid",
+                data: {
+                    username: user.username,
+                    email: user.email,
+                    uuid: user.uuid,
+                }
+
+            })
+
+        } else {
+            res.status(400).send({
+                status: "Verify error",
+                message: `No user exists with uuid ${req.body.uuid}`
+            })
+            return;
+        }
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).send({
+            error: 'An error has occured!',
+            value: error
+        })
+    } finally {
+        await client.close()
+    }
+
+})
+
+
+
 
 app.listen(PORT, () => {
     console.log(`app running at http://localhost:${PORT}`);
