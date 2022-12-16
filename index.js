@@ -121,11 +121,9 @@ app.post("/login", async (req, res) => {
         //retrieve the users collection data
         const colli = client.db('Nft_Universe').collection('users')
         const query = {
-            email: loginuser.email
+            email: loginuser.email ``
         }
         const user = await colli.findOne(query)
-
-
 
         if (!user) {
             res.status(400).send({
@@ -233,6 +231,213 @@ app.post("/verifyID", async (req, res) => {
     }
 
 })
+
+app.post("/like", async (req, res) => {
+
+
+    try {
+        //connect to the db
+        await client.connect()
+
+        //retrieve the users collection data
+        const colli = client.db('Nft_Universe').collection('likes')
+
+        const check = await colli.findOne({
+            collectionId: req.body.collectionId
+        })
+        if (check) {
+            res.status(400).send({
+
+                message: "You already have liked this collection",
+
+
+            })
+            return
+        }
+
+
+        const user = await colli.insertOne({
+            collectionId: req.body.collectionId,
+            userId: req.body.userId,
+            title: req.body.title,
+            img: req.body.img,
+            rank: req.body.rank,
+            price: req.body.price
+        })
+
+        res.status(201).send({
+            status: "Saved",
+            message: "Your like has been successfully saved",
+        })
+
+
+    } catch (error) {
+        console.log(error)
+        res.status(400).send({
+            error: 'An error has occured!',
+            value: error
+        })
+    } finally {
+        await client.close()
+    }
+
+})
+
+app.get("/like/:id", async (req, res) => {
+
+    try {
+        //connect to the database
+        await client.connect()
+
+        console.log(JSON.stringify(req.params.id))
+
+        //retrieve the like collection
+
+        const colli = client.db('Nft_Universe').collection('likes')
+
+        const likedItem = await colli.find({
+
+            userId: req.params.id
+
+        }).toArray()
+
+        res.status(201).send({
+
+            data: likedItem,
+
+            status: "Success",
+
+        })
+
+    } catch (error) {
+        res.status(400).send({
+
+            error: "An error has occured!",
+
+            value: error
+
+        })
+
+    } finally {
+        await client.close()
+    }
+
+})
+
+app.delete("/deleteLike", async (req, res) => {
+    try {
+
+        //connect to the db
+
+        await client.connect();
+
+        //retrieve the users collection data
+
+        const colli = client.db('Nft_Universe').collection('likes')
+
+        const likes = await colli.findOneAndDelete({
+
+            collectionId: req.query.collectionId,
+            userId: req.query.userId
+        })
+
+        if (likes) {
+            res.status(200).send({
+                status: "Success",
+                message: "Your like has been deleted !"
+
+            })
+            return
+
+        } else {
+
+            res.status(401).send({
+                status: "Bad Request",
+                message: "Can't delete your like"
+
+            })
+
+            return
+
+        }
+
+    } catch (error) {
+
+        console.log(error)
+
+        res.status(500).send({
+
+            error: 'Something went wrong!',
+
+            value: error
+
+        });
+
+    } finally {
+
+        await client.close();
+
+    }
+
+})
+app.put("/changename", async (req, res) => {
+    if (!req.body.username) {
+
+        res.status(401).send({
+            status: "Bad Request",
+            message: " New username is missing"
+
+        })
+
+        return
+
+    }
+
+    try {
+        //connect to the db
+        await client.connect();
+
+
+        //retrieve the users collection data
+
+        const colli = client.db('Nft_Universe').collection('users')
+
+        const user = await colli.updateOne({
+            uuid: req.query.id
+
+        }, {
+            $set: {
+                username: req.body.username
+
+            }
+        })
+        res.status(200).send({
+
+            message: 'Your username is succesfully updated !'
+
+        })
+
+    } catch (error) {
+
+        console.log(error)
+        res.status(500).send({
+
+            error: 'Something went wrong!',
+            value: error
+
+        });
+
+    } finally {
+
+        await client.close();
+
+    }
+
+})
+
+
+
+
 
 
 
