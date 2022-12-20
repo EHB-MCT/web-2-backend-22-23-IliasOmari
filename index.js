@@ -121,7 +121,7 @@ app.post("/login", async (req, res) => {
         //retrieve the users collection data
         const colli = client.db('Nft_Universe').collection('users')
         const query = {
-            email: loginuser.email ``
+            email: loginuser.email
         }
         const user = await colli.findOne(query)
 
