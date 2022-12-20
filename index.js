@@ -24,6 +24,8 @@ let users = [];
 app.use(cors())
 app.use(express.json())
 
+///code from coding along session of Mike Derycke (https://www.youtube.com/@MikeDerycke)
+
 app.get("/testMongo", async (req, res) => {
     try {
         //connect to the db
@@ -231,10 +233,11 @@ app.post("/verifyID", async (req, res) => {
     }
 
 })
+/// 
+
+///inspiration from coding along session(https://www.youtube.com/@MikeDerycke)
 
 app.post("/like", async (req, res) => {
-
-
     try {
         //connect to the db
         await client.connect()
@@ -243,7 +246,9 @@ app.post("/like", async (req, res) => {
         const colli = client.db('Nft_Universe').collection('likes')
 
         const check = await colli.findOne({
-            collectionId: req.body.collectionId
+            collectionId: req.body.collectionId,
+            userId: req.body.userId
+
         })
         if (check) {
             res.status(400).send({
@@ -434,6 +439,7 @@ app.put("/changename", async (req, res) => {
     }
 
 })
+///
 
 
 

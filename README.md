@@ -6,7 +6,7 @@ Nft Universe is a site where you can explore NFT collections, NFTs, and NFT crea
 ## Installation
 
 ```bash
-npm install -g nodemon
+npm install
 ```
 ## Used packages
 
@@ -25,7 +25,9 @@ npm i mongodb
 ```bash
 npm i uuid
 ```
-
+```bash
+npm install -g nodemon
+```
 
 
 ## Sources
