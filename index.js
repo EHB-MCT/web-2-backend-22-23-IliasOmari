@@ -248,13 +248,11 @@ app.post("/like", async (req, res) => {
         const check = await colli.findOne({
             collectionId: req.body.collectionId,
             userId: req.body.userId
-
         })
         if (check) {
             res.status(400).send({
 
-                message: "You already have liked this collection",
-
+                message: "You already have liked this item",
 
             })
             return
@@ -293,8 +291,6 @@ app.get("/like/:id", async (req, res) => {
     try {
         //connect to the database
         await client.connect()
-
-        console.log(JSON.stringify(req.params.id))
 
         //retrieve the like collection
 
