@@ -32,13 +32,18 @@ npm install -g nodemon
 
 ## User
 POST => /login - login of user 
+
 POST => /verifyID - check for empty and faulty ID fields
+
 POST => /register register new user 
+
 PUT => /changename - connected user can change his username
 
 ## Likesystem
 GET => /like/:id - Get all the liked items of the connected user
+
 POST => /like - post a like to the likes-page
+
 DELETE => /deleteLike - user can delete a like on his like-page.
 
 ## Sources
